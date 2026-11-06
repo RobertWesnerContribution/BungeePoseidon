@@ -2,7 +2,10 @@ package net.md_5.bungee.connection;
 
 import com.google.common.io.ByteStreams;
 import lombok.RequiredArgsConstructor;
-import net.md_5.bungee.*;
+import net.md_5.bungee.EntityMap;
+import net.md_5.bungee.ServerConnection;
+import net.md_5.bungee.UserConnection;
+import net.md_5.bungee.Util;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.event.PluginMessageEvent;
@@ -66,19 +69,18 @@ public class DownstreamBridge extends PacketHandler {
         }
 
         if (pluginMessage.getTag().equals(PacketFAPluginMessage.BUNGEE_CHANNEL)) {
-            final var subChannel = in.readUTF();
+            String subChannel = in.readUTF();
 
             // TODO: we should expand it further to match modern handling
             // see: https://github.com/SpigotMC/BungeeCord/blob/55e1b0bbe776e4b3af6c572a2b3d43fb60a526b1/proxy/src/main/java/net/md_5/bungee/connection/DownstreamBridge.java#L323
             switch (subChannel) {
-                case "Connect":
-                    ServerInfo server = bungee.getServerInfo( in.readUTF() );
+                case "Connect" -> {
+                    ServerInfo server = bungee.getServerInfo(in.readUTF());
                     if (server != null) {
                         con.connect(server);
                     }
-
-                    break;
-                default:
+                }
+                default ->
                     bungee.getLogger().warning("Received unknown/unimplemented Bungee subchannel \"" + subChannel + "\"!");
             }
 
